@@ -56,19 +56,20 @@ class DWT_SVD_Watermarking:
         return "output/watermarked_image.jpg"
 
     def extract(self, wm, data):
+        Snew = np.load(data)
         path2 = wm
         wimg = cv2.imread(path2, 0)
 
         # DWT
         Cw = pywt.wavedec2(wimg, wavelet="haar", level=1)
+        Cw[0] = cv2.resize(Cw[0], Snew.shape)
         shape_LL = Cw[0].shape  # C[0] is LL
 
         # SVD
         Ucw, Scw, Vcw = np.linalg.svd(Cw[0], full_matrices=False)
 
-        Snew = np.load(data)
-        Uw, Sw, Vw = np.linalg.svd(Snew, full_matrices=False)
-        LLnew1 = Uw.dot(np.diag(Scw)).dot(Vw)
+        Ud, Sd, Vd = np.linalg.svd(Snew, full_matrices=False)
+        LLnew1 = Ud.dot(np.diag(Scw)).dot(Vd)
 
         Wdnew = np.zeros((min(shape_LL), min(shape_LL)))
 
@@ -83,4 +84,7 @@ class DWT_SVD_Watermarking:
                 Wdnew[py][px] = (LLnew1[py][px] - Scw[py][px]) / alpha
 
         cv2.imwrite("output/recovered_watermark.jpg", Wdnew)
+        histogram.get_histogram(
+            "output/recovered_watermark.jpg", "histogram/recovered_watermark.jpg"
+        )
         return "output/recovered_watermark.jpg"

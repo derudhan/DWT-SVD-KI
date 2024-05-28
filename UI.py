@@ -149,11 +149,11 @@ class APP:
         file_path = filedialog.askopenfilename(filetypes=[("npy files", "*.npy")])
         if file_path:
             self.data_watermarked = file_path
-            self.image_label.configure(text="Data Berhasil Dimuat", image=None)
-            self.image_label.image = None
+            messagebox.showinfo("Berhasil", "Data berhasil dimuat!")
 
     def display_image(self, img):
         img = cv2.imread(img)
+        print("test", img)
         img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         img_pil = Image.fromarray(img_rgb)
 
@@ -198,6 +198,7 @@ class APP:
             self.watermarked_image, self.data_watermarked
         )
         self.display_image(extracted_image)
+        extracted_image = cv2.imread(extracted_image)
         save_path = filedialog.asksaveasfilename(
             defaultextension=".png",
             filetypes=[("PNG files", "*.png"), ("JPEG files", "*.jpg;*.jpeg")],
